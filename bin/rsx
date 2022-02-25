@@ -1,0 +1,48 @@
+#! /bin/bash
+
+
+
+rsx()(
+set -eu -o pipefail
+
+usage(){
+
+cat <<-EOM
+
+NAME
+    rsx  --  Remote Shell eXecution
+
+
+IMPLEMENTATION STATUS
+
+  - utilise un profil ssh fixe (satsuki)
+  - utilise le mot de passe du fichier tmp
+
+
+EOM
+
+}
+
+
+_remote_execute(){
+
+
+
+exec 3<&0 
+
+cat tmp | cat <<EOF | ssh satsuki  sudo --prompt="" -S -- sh 
+$(cat <&3)
+EOF
+
+
+
+}
+
+
+[ ! -t 0 ] && (cat - | _remote_execute )  || $@
+
+)
+
+
+[ ! -t 0 ] && { exec 3<&0; [ "${BASH_SOUCE[0]}" = "$0" ] || rsx $@ <&3 ; } || { [ "${BASH_SOUCE[0]}" = "$0" ] || rsx $@ ; }
+

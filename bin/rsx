@@ -5,6 +5,7 @@
 rsx()(
 set -eu -o pipefail
 
+
 usage(){
 
 cat <<-EOM
@@ -15,8 +16,13 @@ NAME
 
 IMPLEMENTATION STATUS
 
-  - utilise un profil ssh fixe (satsuki)
-  - utilise le mot de passe du fichier tmp
+  - utilise un profil ssh 
+  - la clef ssh doit être installée sur le serveur
+  - utilise le mot de passe du fichier /tmp/1234
+
+EXEMPLE
+
+  
 
 
 EOM
@@ -26,17 +32,33 @@ EOM
 
 _remote_execute(){
 
-
-
 exec 3<&0 
 
-cat tmp | cat <<EOF | ssh satsuki  sudo --prompt="" -S -- sh 
+echo cat /tmp/1234 | cat <<EOF | ssh ovh  sudo --prompt="" -S -- sh 
 $(cat <&3)
 EOF
 
 
 
 }
+
+# Set default variables
+
+LOGIN_USERNAME=$(whoami)
+BECOME_USERNAME=root # ...
+LOGIN_PASSWORD=1234
+BECOME_PASSWORD=${LOGIN_PASSWORD}
+
+
+while getopts "u:p:" opts; do
+  case "$opts" in
+    u) LOGIN_USERNAME="${OPTARG}" ;;
+    p) SSH_PROFILE="${OPTARG}" ;;
+    *) echo error while parsing args ; exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
 
 
 [ ! -t 0 ] && (cat - | _remote_execute )  || $@

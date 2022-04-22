@@ -1,7 +1,5 @@
 # Remote Shell Execution
 
-
-
 Exécute une commande shell (presque qu') aussi facilement que localement.
 
 
@@ -21,7 +19,7 @@ Manuellement:
   - un mot de passe dans un fichier,
   - une clef ssh inscrite sur le serveur,
   - un agent ssh en activité
-  - un ne clef inscrite à l'agent
+  - une clef inscrite à l'agent
 
 
 Configuration automatique:

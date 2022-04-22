@@ -5,7 +5,6 @@
 rsx()(
 set -eu -o pipefail
 
-
 usage(){
 
 cat <<-EOM
@@ -33,10 +32,15 @@ EOM
 _remote_execute(){
 
 exec 3<&0 
-
+if [[ "$AS_ROOT" == "1" ]] ; then
 echo cat /tmp/1234 | cat <<EOF | ssh ovh  sudo --prompt="" -S -- sh 
 $(cat <&3)
 EOF
+else
+cat <<EOF | ssh ovh sh
+$(cat <&3)
+EOF
+fi
 
 
 
@@ -48,18 +52,18 @@ LOGIN_USERNAME=$(whoami)
 BECOME_USERNAME=root # ...
 LOGIN_PASSWORD=1234
 BECOME_PASSWORD=${LOGIN_PASSWORD}
+AS_ROOT=0 
 
-
-while getopts "u:p:" opts; do
+while getopts "u:p:r" opts; do
   case "$opts" in
     u) LOGIN_USERNAME="${OPTARG}" ;;
     p) SSH_PROFILE="${OPTARG}" ;;
+    r) AS_ROOT=1 ;;
     *) echo error while parsing args ; exit 1 ;;
   esac
 done
 
 shift $((OPTIND-1))
-
 
 [ ! -t 0 ] && (cat - | _remote_execute )  || $@
 

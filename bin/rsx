@@ -33,7 +33,7 @@ _remote_execute(){
 
 exec 3<&0 
 if [[ "$AS_ROOT" == "1" ]] ; then
-echo cat /tmp/1234 | cat <<EOF | ssh ovh  sudo --prompt="" -S -- sh 
+echo cat /tmp/1234 | cat <<EOF | ssh ovh  sudo -u $BECOME_USERNAME --prompt="" -S -- sh 
 $(cat <&3)
 EOF
 else
@@ -56,7 +56,8 @@ AS_ROOT=0
 
 while getopts "u:p:r" opts; do
   case "$opts" in
-    u) LOGIN_USERNAME="${OPTARG}" ;;
+    u) LOGIN_USERNAME="${OPTARG}" 
+       BECOME_USERNAME=${OPTARG} ;;
     p) SSH_PROFILE="${OPTARG}" ;;
     r) AS_ROOT=1 ;;
     *) echo error while parsing args ; exit 1 ;;
